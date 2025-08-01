@@ -11,12 +11,12 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers import entity
 import homeassistant.helpers.typing as ha_typing
 
-import const
-import mevo_api
+from . import const
+from . import mevo_api
 
 LOG = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = sensor.PLATFORM_SCHEMA.extend({
+sensor.PLATFORM_SCHEMA = sensor.PLATFORM_SCHEMA.extend({
     vol.Required(const.CONF_STATIONS): vol.All(cv.ensure_list, [cv.string]),
 })
 
