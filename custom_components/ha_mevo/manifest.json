@@ -1,0 +1,11 @@
+{
+  "codeowners": ["@dulek"],
+  "config_flow": false,
+  "dependencies": [],
+  "documentation": "https://github.com/dulek/ha_mevo",
+  "domain": "ha_mevo",
+  "iot_class": "cloud_polling",
+  "name": "Mevo",
+  "requirements": ["requests"],
+  "version": "0.0.1"
+}
