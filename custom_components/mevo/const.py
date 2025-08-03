@@ -1,4 +1,4 @@
-DOMAIN = "ha_mevo"
+DOMAIN = "mevo"
 
 CONF_STATIONS = "stations"
 
