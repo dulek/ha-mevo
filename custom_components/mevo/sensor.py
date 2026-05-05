@@ -17,7 +17,7 @@ from . import mevo_api
 
 LOG = logging.getLogger(__name__)
 
-sensor.PLATFORM_SCHEMA = sensor.PLATFORM_SCHEMA.extend({
+PLATFORM_SCHEMA = sensor.PLATFORM_SCHEMA.extend({
     vol.Required(const.CONF_STATIONS): vol.All(cv.ensure_list, [cv.string]),
 })
 
