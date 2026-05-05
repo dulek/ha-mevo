@@ -23,11 +23,6 @@ PLATFORM_SCHEMA = sensor.PLATFORM_SCHEMA.extend({
 
 SCAN_INTERVAL = datetime.timedelta(minutes=5)
 
-async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
-    """Set up the Mevo component."""
-    # @TODO: Add setup code.
-    return True
-
 async def async_setup_platform(
     hass: core.HomeAssistant, config: ha_typing.ConfigType,
     async_add_entities: abc.Callable,
