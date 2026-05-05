@@ -6,10 +6,8 @@ import voluptuous as vol
 
 from homeassistant.components import sensor
 from homeassistant import core
-from homeassistant import const as ha_const
 from homeassistant.helpers import aiohttp_client
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers import entity
 import homeassistant.helpers.typing as ha_typing
 
 from . import const
@@ -35,7 +33,11 @@ async def async_setup_platform(
         MevoSensor(mevo, station) for station in config[const.CONF_STATIONS]]
     async_add_entities(sensors, update_before_add=True)
 
-class MevoSensor(entity.Entity):
+class MevoSensor(sensor.SensorEntity):
+    _attr_icon = "mdi:bike"
+    _attr_state_class = sensor.SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = "bikes"
+
     def __init__(self, mevo_api: mevo_api.MevoAPI, station: str):
         super().__init__()
         self.mevo_api = mevo_api
@@ -44,7 +46,6 @@ class MevoSensor(entity.Entity):
         self._station_info = None
         self._station_id = None
         self._attr_unique_id = self.station
-        self._attr_icon = "mdi:bike"
 
     def update_station_attrs(self) -> None:
         self._attr_extra_state_attributes.update({
@@ -83,23 +84,23 @@ class MevoSensor(entity.Entity):
                 else:
                     LOG.error("Station %s not found in Mevo API", self.station)
                     self._attr_available = False
-                    self._attr_state = ha_const.STATE_UNKNOWN
+                    self._attr_native_value = None
                     return
 
             # If we have station info, get availability
             availability = await self.mevo_api.get_availability(
                 self._station_id)
             if availability is not None:
-                self._attr_state = availability.get("num_bikes_available", 0)
+                self._attr_native_value = availability.get("num_bikes_available", 0)
                 self.update_availability_attrs(availability)
                 self._attr_available = True
             else:
                 LOG.error("Availability information for station %s not found "
                           "in Mevo API", self.station)
                 self._attr_available = False
-                self._attr_state = ha_const.STATE_UNKNOWN
+                self._attr_native_value = None
         except Exception:
             self._attr_available = False
-            self._attr_state = ha_const.STATE_UNKNOWN
+            self._attr_native_value = None
             LOG.exception("Error retrieving data from Mevo API for sensor %s",
                           self.name)
