@@ -6,7 +6,7 @@ at stations. This integration can be installed using [HACS](https://hacs.xyz/).
 ## Features
 
 - Sensor entities for selected Mevo stations
-- Real-time updates on available bikes, e-bikes, and docks
+- Updates every 5 minutes for available bikes, e-bikes, and docks
 - Station details: address, location, capacity, rental URI
 
 ## Installation
@@ -17,19 +17,12 @@ at stations. This integration can be installed using [HACS](https://hacs.xyz/).
 
 ## Configuration
 
-Add the following to your `configuration.yaml`:
+Mevo is configured from the Home Assistant UI. Go to **Settings → Devices &
+Services → Add Integration** and search for **Mevo**. The integration will
+fetch the live station list from the Mevo API and let you pick the stations
+you want to monitor from a dropdown.
 
-```yaml
-sensor:
-  - platform: mevo
-    stations:
-      - "GDAXXX"
-      - "SOPYYY"
-```
-
-Replace `"Station Name 1"` and `"Station Name 2"` with the names of Mevo
-stations you want to monitor. You can find the available station names in the
-Mevo app, they're in the form of _GDA020_, _SOP016_.
+To change the set of monitored stations, remove and re-add the integration.
 
 ## Sensor Attributes
 
