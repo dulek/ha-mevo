@@ -1,5 +1,12 @@
+import asyncio
+
+import aiohttp
+import async_timeout
+
 ENDPOINT_STATIONS = "https://gbfs.urbansharing.com/rowermevo.pl/station_information.json"
 ENDPOINT_STATUS = "https://gbfs.urbansharing.com/rowermevo.pl/station_status.json"
+
+REQUEST_TIMEOUT = 10
 
 
 class MevoApiError(Exception):
@@ -12,20 +19,25 @@ class MevoAPI(object):
     def __init__(self, session):
         self._session = session
 
+    async def _fetch(self, url):
+        try:
+            async with async_timeout.timeout(REQUEST_TIMEOUT):
+                async with self._session.get(url) as response:
+                    if response.status != 200:
+                        raise MevoApiError(
+                            f"HTTP {response.status} from {url}")
+                    return await response.json()
+        except asyncio.TimeoutError as err:
+            raise MevoApiError(f"Timeout fetching {url}") from err
+        except aiohttp.ClientError as err:
+            raise MevoApiError(f"Transport error fetching {url}") from err
+
     async def get_stations(self):
         """Return the full list of station information entries."""
-        async with self._session.get(ENDPOINT_STATIONS) as response:
-            if response.status != 200:
-                raise MevoApiError(
-                    f"Failed to fetch stations: {response.status}")
-            data = await response.json()
-            return data.get("data", {}).get("stations", [])
+        data = await self._fetch(ENDPOINT_STATIONS)
+        return data.get("data", {}).get("stations", [])
 
     async def get_status(self):
         """Return the full list of station status entries."""
-        async with self._session.get(ENDPOINT_STATUS) as response:
-            if response.status != 200:
-                raise MevoApiError(
-                    f"Failed to fetch status: {response.status}")
-            data = await response.json()
-            return data.get("data", {}).get("stations", [])
+        data = await self._fetch(ENDPOINT_STATUS)
+        return data.get("data", {}).get("stations", [])
