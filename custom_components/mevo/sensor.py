@@ -1,6 +1,5 @@
 from collections import abc
 import logging
-import datetime
 
 import voluptuous as vol
 
@@ -8,9 +7,11 @@ from homeassistant.components import sensor
 from homeassistant import core
 from homeassistant.helpers import aiohttp_client
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 import homeassistant.helpers.typing as ha_typing
 
 from . import const
+from . import coordinator as mevo_coordinator
 from . import mevo_api
 
 LOG = logging.getLogger(__name__)
@@ -19,7 +20,6 @@ PLATFORM_SCHEMA = sensor.PLATFORM_SCHEMA.extend({
     vol.Required(const.CONF_STATIONS): vol.All(cv.ensure_list, [cv.string]),
 })
 
-SCAN_INTERVAL = datetime.timedelta(minutes=5)
 
 async def async_setup_platform(
     hass: core.HomeAssistant, config: ha_typing.ConfigType,
@@ -27,80 +27,69 @@ async def async_setup_platform(
     discovery_info: ha_typing.DiscoveryInfoType | None = None) -> None:
     """Set up the sensor platform."""
     session = aiohttp_client.async_get_clientsession(hass)
-    mevo = mevo_api.MevoAPI(session)
-    # TODO(dulek): What if stations are duplicated? We use ID in as unique_id.
-    sensors = [
-        MevoSensor(mevo, station) for station in config[const.CONF_STATIONS]]
-    async_add_entities(sensors, update_before_add=True)
+    api = mevo_api.MevoAPI(session)
+    coordinator = mevo_coordinator.MevoCoordinator(hass, api)
+    await coordinator.async_config_entry_first_refresh()
 
-class MevoSensor(sensor.SensorEntity):
+    sensors = [
+        MevoSensor(coordinator, station)
+        for station in config[const.CONF_STATIONS]
+    ]
+    async_add_entities(sensors)
+
+
+class MevoSensor(CoordinatorEntity[dict], sensor.SensorEntity):
     _attr_icon = "mdi:bike"
     _attr_state_class = sensor.SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "bikes"
 
-    def __init__(self, mevo_api: mevo_api.MevoAPI, station: str):
-        super().__init__()
-        self.mevo_api = mevo_api
+    def __init__(
+        self, coordinator: mevo_coordinator.MevoCoordinator, station: str):
+        super().__init__(coordinator)
         self.station = station
         self._attr_name = "Stacja " + station
-        self._station_info = None
-        self._station_id = None
-        self._attr_unique_id = self.station
+        self._attr_unique_id = station
 
-    def update_station_attrs(self) -> None:
-        self._attr_extra_state_attributes.update({
-            const.ATTR_STATION_ID: self._station_info.get("station_id"),
-            const.ATTR_ADDRESS: self._station_info.get("address"),
-            const.ATTR_LATITUDE: self._station_info.get("lat"),
-            const.ATTR_LONGITUDE: self._station_info.get("lon"),
-            const.ATTR_CAPACITY: self._station_info.get("capacity"),
-            # This is simplification, but the ios and android URIs are the same
-            const.ATTR_RENTAL_URI: self._station_info.get(
-            "rental_uris", {}).get("android")
-        })
+    def _station_id(self) -> str | None:
+        for station_id, info in self.coordinator.station_info.items():
+            if info.get("name") == self.station:
+                return station_id
+        return None
 
-    def update_availability_attrs(self, avail) -> None:
-        d = {
-            const.ATTR_DOCKS_AVAILABLE: avail.get("num_docks_available", 0)
+    @property
+    def available(self) -> bool:
+        return super().available and self._station_id() is not None
+
+    @property
+    def native_value(self):
+        station_id = self._station_id()
+        if station_id is None:
+            return None
+        status = self.coordinator.data.get(station_id)
+        if status is None:
+            return None
+        return status.get("num_bikes_available", 0)
+
+    @property
+    def extra_state_attributes(self) -> dict | None:
+        station_id = self._station_id()
+        if station_id is None:
+            return None
+        info = self.coordinator.station_info.get(station_id, {})
+        status = self.coordinator.data.get(station_id, {})
+        attrs = {
+            const.ATTR_STATION_ID: station_id,
+            const.ATTR_ADDRESS: info.get("address"),
+            const.ATTR_LATITUDE: info.get("lat"),
+            const.ATTR_LONGITUDE: info.get("lon"),
+            const.ATTR_CAPACITY: info.get("capacity"),
+            # The ios and android URIs are the same.
+            const.ATTR_RENTAL_URI: info.get("rental_uris", {}).get("android"),
+            const.ATTR_DOCKS_AVAILABLE: status.get("num_docks_available", 0),
         }
-        for vh in avail.get("vehicle_types_available", []):
-            if vh.get('vehicle_type_id') == "ebike":
-                d[const.ATTR_EBIKES_AVAILABLE] = vh.get('count', 0)
-            elif vh.get('vehicle_type_id') == "bike":
-                d[const.ATTR_BIKES_AVAILABLE] = vh.get('count', 0)
-        self._attr_extra_state_attributes.update(d)
-
-    async def async_update(self) -> None:
-        """Update all sensors."""
-        try:
-            # Get station by name and set attributes
-            if self._station_info is None:
-                self._station_info = await self.mevo_api.get_station_by_name(
-                    self.station)
-
-                if self._station_info is not None:
-                    self._station_id = self._station_info.get("station_id")
-                    self.update_station_attrs()
-                else:
-                    LOG.error("Station %s not found in Mevo API", self.station)
-                    self._attr_available = False
-                    self._attr_native_value = None
-                    return
-
-            # If we have station info, get availability
-            availability = await self.mevo_api.get_availability(
-                self._station_id)
-            if availability is not None:
-                self._attr_native_value = availability.get("num_bikes_available", 0)
-                self.update_availability_attrs(availability)
-                self._attr_available = True
-            else:
-                LOG.error("Availability information for station %s not found "
-                          "in Mevo API", self.station)
-                self._attr_available = False
-                self._attr_native_value = None
-        except Exception:
-            self._attr_available = False
-            self._attr_native_value = None
-            LOG.exception("Error retrieving data from Mevo API for sensor %s",
-                          self.name)
+        for vh in status.get("vehicle_types_available", []):
+            if vh.get("vehicle_type_id") == "ebike":
+                attrs[const.ATTR_EBIKES_AVAILABLE] = vh.get("count", 0)
+            elif vh.get("vehicle_type_id") == "bike":
+                attrs[const.ATTR_BIKES_AVAILABLE] = vh.get("count", 0)
+        return attrs

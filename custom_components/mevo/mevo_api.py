@@ -1,55 +1,31 @@
 ENDPOINT_STATIONS = "https://gbfs.urbansharing.com/rowermevo.pl/station_information.json"
-ENDPOINT_AVAILABILITY = "https://gbfs.urbansharing.com/rowermevo.pl/station_status.json"
+ENDPOINT_STATUS = "https://gbfs.urbansharing.com/rowermevo.pl/station_status.json"
+
 
 class MevoStation(object):
     pass
+
 
 class MevoAPI(object):
     """Mevo API client."""
 
     def __init__(self, session):
-        """Initialize the Mevo client."""
         self._session = session
-        self._stations = []
 
     async def get_stations(self):
-        """Get the list of stations."""
+        """Return the full list of station information entries."""
         async with self._session.get(ENDPOINT_STATIONS) as response:
             if response.status != 200:
-                raise Exception(f"Failed to fetch stations: {response.status}")
+                raise Exception(
+                    f"Failed to fetch stations: {response.status}")
             data = await response.json()
-            # TODO(dulek): I'm not 100% sure it's a good idea to cache
-            # stations. We surely need some TTL? Or if user changes the config
-            # we'll reload the integration anyway?
-            self._stations = data.get("data", {}).get("stations", [])
-            return self._stations
+            return data.get("data", {}).get("stations", [])
 
-    async def get_station_by_name(self, name):
-        """Get a station by its name."""
-        if not self._stations:
-            await self.get_stations()
-        for station in self._stations:
-            if station.get("name") == name:
-                return station
-        return None
-
-    async def get_station_by_id(self, station_id):
-        """Get a station by its ID."""
-        if not self._stations:
-            await self.get_stations()
-        for station in self._stations:
-            if station.get("station_id") == station_id:
-                return station
-        return None
-
-    async def get_availability(self, station_id):
-        """Get the availability of a station."""
-        async with self._session.get(ENDPOINT_AVAILABILITY) as response:
+    async def get_status(self):
+        """Return the full list of station status entries."""
+        async with self._session.get(ENDPOINT_STATUS) as response:
             if response.status != 200:
-                raise Exception(f"Failed to fetch availability: {response.status}")
+                raise Exception(
+                    f"Failed to fetch status: {response.status}")
             data = await response.json()
-            stations = data.get("data", {}).get("stations", [])
-            for station in stations:
-                if station.get("station_id") == station_id:
-                    return station
-            return None
+            return data.get("data", {}).get("stations", [])
