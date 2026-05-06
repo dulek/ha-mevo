@@ -18,8 +18,10 @@ async def async_setup_entry(
     coordinator: mevo_coordinator.MevoCoordinator = (
         hass.data[const.DOMAIN][entry.entry_id])
 
+    station_ids = entry.options.get(
+        const.CONF_STATIONS, entry.data.get(const.CONF_STATIONS, []))
     sensors = []
-    for station_id in entry.data[const.CONF_STATIONS]:
+    for station_id in station_ids:
         info = coordinator.station_info.get(station_id)
         if info is None:
             LOG.error("Station %s not found in Mevo API", station_id)

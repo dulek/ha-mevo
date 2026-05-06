@@ -16,6 +16,20 @@
       "single_instance_allowed": "Mevo is already configured."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Mevo",
+        "description": "Edit the set of monitored Mevo stations.",
+        "data": {
+          "stations": "Stations"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the Mevo API."
+    }
+  },
   "entity": {
     "sensor": {
       "station": {

@@ -22,7 +22,8 @@ Services → Add Integration** and search for **Mevo**. The integration will
 fetch the live station list from the Mevo API and let you pick the stations
 you want to monitor from a dropdown.
 
-To change the set of monitored stations, remove and re-add the integration.
+To change the set of monitored stations later, open the integration entry
+and click **Configure**.
 
 ## Sensor Attributes
 

@@ -44,3 +44,27 @@ async def test_cannot_connect(
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"] == {"base": "cannot_connect"}
+
+
+async def test_options_flow_updates_selection(
+    hass: HomeAssistant, mock_mevo_feeds) -> None:
+    entry = MockConfigEntry(
+        domain=const.DOMAIN,
+        data={const.CONF_STATIONS: ["station-1"]},
+    )
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "init"
+
+    result2 = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {const.CONF_STATIONS: ["station-1", "station-2"]},
+    )
+    assert result2["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+
+    assert entry.options[const.CONF_STATIONS] == ["station-1", "station-2"]
