@@ -4,8 +4,10 @@
   "dependencies": [],
   "documentation": "https://github.com/dulek/ha_mevo",
   "domain": "mevo",
+  "integration_type": "service",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/dulek/ha_mevo/issues",
   "name": "Mevo",
   "requirements": [],
-  "version": "0.0.1"
+  "version": "0.1.0"
 }
