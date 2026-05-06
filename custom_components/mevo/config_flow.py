@@ -26,7 +26,7 @@ class MevoConfigFlow(ConfigFlow, domain=const.DOMAIN):
         api = mevo_api.MevoAPI(session)
         try:
             stations = await api.get_stations()
-        except Exception:
+        except mevo_api.MevoApiError:
             LOG.exception("Failed to fetch Mevo stations during config flow")
             errors["base"] = "cannot_connect"
             stations = []

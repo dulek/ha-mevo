@@ -2,6 +2,10 @@ ENDPOINT_STATIONS = "https://gbfs.urbansharing.com/rowermevo.pl/station_informat
 ENDPOINT_STATUS = "https://gbfs.urbansharing.com/rowermevo.pl/station_status.json"
 
 
+class MevoApiError(Exception):
+    """Raised when the Mevo GBFS API returns an unexpected response."""
+
+
 class MevoAPI(object):
     """Mevo API client."""
 
@@ -12,7 +16,7 @@ class MevoAPI(object):
         """Return the full list of station information entries."""
         async with self._session.get(ENDPOINT_STATIONS) as response:
             if response.status != 200:
-                raise Exception(
+                raise MevoApiError(
                     f"Failed to fetch stations: {response.status}")
             data = await response.json()
             return data.get("data", {}).get("stations", [])
@@ -21,7 +25,7 @@ class MevoAPI(object):
         """Return the full list of station status entries."""
         async with self._session.get(ENDPOINT_STATUS) as response:
             if response.status != 200:
-                raise Exception(
+                raise MevoApiError(
                     f"Failed to fetch status: {response.status}")
             data = await response.json()
             return data.get("data", {}).get("stations", [])

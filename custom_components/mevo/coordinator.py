@@ -48,6 +48,6 @@ class MevoCoordinator(DataUpdateCoordinator[dict]):
                 }
                 self._station_info_fetched_at = datetime.datetime.utcnow()
             statuses = await self._api.get_status()
-        except Exception as err:
+        except mevo_api.MevoApiError as err:
             raise UpdateFailed(f"Mevo API error: {err}") from err
         return {s["station_id"]: s for s in statuses}
