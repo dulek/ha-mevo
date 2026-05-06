@@ -1,0 +1,24 @@
+{
+  "data": {
+    "stations": [
+      {
+        "station_id": "station-1",
+        "num_bikes_available": 5,
+        "num_docks_available": 3,
+        "vehicle_types_available": [
+          {"vehicle_type_id": "bike", "count": 2},
+          {"vehicle_type_id": "ebike", "count": 3}
+        ]
+      },
+      {
+        "station_id": "station-2",
+        "num_bikes_available": 0,
+        "num_docks_available": 12,
+        "vehicle_types_available": [
+          {"vehicle_type_id": "bike", "count": 0},
+          {"vehicle_type_id": "ebike", "count": 0}
+        ]
+      }
+    ]
+  }
+}

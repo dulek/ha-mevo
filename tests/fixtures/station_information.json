@@ -1,0 +1,30 @@
+{
+  "data": {
+    "stations": [
+      {
+        "station_id": "station-1",
+        "name": "GDA001",
+        "address": "Długi Targ 1",
+        "lat": 54.3479,
+        "lon": 18.6531,
+        "capacity": 10,
+        "rental_uris": {
+          "android": "mevo://station/1",
+          "ios": "mevo://station/1"
+        }
+      },
+      {
+        "station_id": "station-2",
+        "name": "GDA002",
+        "address": "Wały Jagiellońskie 2",
+        "lat": 54.3489,
+        "lon": 18.6481,
+        "capacity": 12,
+        "rental_uris": {
+          "android": "mevo://station/2",
+          "ios": "mevo://station/2"
+        }
+      }
+    ]
+  }
+}
