@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mevo",
+        "description": "Wybierz stacje Mevo, które chcesz monitorować.",
+        "data": {
+          "stations": "Stacje"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie udało się połączyć z API Mevo."
+    },
+    "abort": {
+      "single_instance_allowed": "Mevo jest już skonfigurowane."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "station": {
+        "name": "Stacja {name}"
+      }
+    }
+  }
+}

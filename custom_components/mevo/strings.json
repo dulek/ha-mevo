@@ -15,5 +15,12 @@
     "abort": {
       "single_instance_allowed": "Mevo is already configured."
     }
+  },
+  "entity": {
+    "sensor": {
+      "station": {
+        "name": "Station {name}"
+      }
+    }
   }
 }

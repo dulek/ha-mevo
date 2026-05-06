@@ -32,13 +32,17 @@ class MevoSensor(CoordinatorEntity[dict], sensor.SensorEntity):
     _attr_icon = "mdi:bike"
     _attr_state_class = sensor.SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "bikes"
+    _attr_has_entity_name = True
+    _attr_translation_key = "station"
 
     def __init__(
         self, coordinator: mevo_coordinator.MevoCoordinator,
         station_id: str, info: dict):
         super().__init__(coordinator)
         self._station_id = station_id
-        self._attr_name = "Stacja " + info.get("name", station_id)
+        self._attr_translation_placeholders = {
+            "name": info.get("name", station_id),
+        }
         self._attr_unique_id = station_id
 
     @property
