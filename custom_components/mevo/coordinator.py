@@ -36,7 +36,7 @@ class MevoCoordinator(DataUpdateCoordinator[dict]):
     def _stations_stale(self) -> bool:
         if not self._station_info or self._station_info_fetched_at is None:
             return True
-        age = datetime.datetime.utcnow() - self._station_info_fetched_at
+        age = datetime.datetime.now(datetime.UTC) - self._station_info_fetched_at
         return age >= STATIONS_TTL
 
     async def _async_update_data(self) -> dict:
@@ -46,7 +46,7 @@ class MevoCoordinator(DataUpdateCoordinator[dict]):
                 self._station_info = {
                     s["station_id"]: s for s in stations
                 }
-                self._station_info_fetched_at = datetime.datetime.utcnow()
+                self._station_info_fetched_at = datetime.datetime.now(datetime.UTC)
             statuses = await self._api.get_status()
         except mevo_api.MevoApiError as err:
             raise UpdateFailed(f"Mevo API error: {err}") from err

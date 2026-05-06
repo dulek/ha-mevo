@@ -1,7 +1,6 @@
 import asyncio
 
 import aiohttp
-import async_timeout
 
 ENDPOINT_STATIONS = "https://gbfs.urbansharing.com/rowermevo.pl/station_information.json"
 ENDPOINT_STATUS = "https://gbfs.urbansharing.com/rowermevo.pl/station_status.json"
@@ -21,7 +20,7 @@ class MevoAPI(object):
 
     async def _fetch(self, url):
         try:
-            async with async_timeout.timeout(REQUEST_TIMEOUT):
+            async with asyncio.timeout(REQUEST_TIMEOUT):
                 async with self._session.get(url) as response:
                     if response.status != 200:
                         raise MevoApiError(
