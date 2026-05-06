@@ -2,10 +2,6 @@ ENDPOINT_STATIONS = "https://gbfs.urbansharing.com/rowermevo.pl/station_informat
 ENDPOINT_STATUS = "https://gbfs.urbansharing.com/rowermevo.pl/station_status.json"
 
 
-class MevoStation(object):
-    pass
-
-
 class MevoAPI(object):
     """Mevo API client."""
 
