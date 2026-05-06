@@ -21,6 +21,14 @@ PLATFORM_SCHEMA = sensor.PLATFORM_SCHEMA.extend({
 })
 
 
+def _resolve_station_id(
+    coordinator: mevo_coordinator.MevoCoordinator, name: str) -> str | None:
+    for station_id, info in coordinator.station_info.items():
+        if info.get("name") == name:
+            return station_id
+    return None
+
+
 async def async_setup_platform(
     hass: core.HomeAssistant, config: ha_typing.ConfigType,
     async_add_entities: abc.Callable,
@@ -31,10 +39,13 @@ async def async_setup_platform(
     coordinator = mevo_coordinator.MevoCoordinator(hass, api)
     await coordinator.async_config_entry_first_refresh()
 
-    sensors = [
-        MevoSensor(coordinator, station)
-        for station in config[const.CONF_STATIONS]
-    ]
+    sensors = []
+    for station in config[const.CONF_STATIONS]:
+        station_id = _resolve_station_id(coordinator, station)
+        if station_id is None:
+            LOG.error("Station %s not found in Mevo API", station)
+            continue
+        sensors.append(MevoSensor(coordinator, station, station_id))
     async_add_entities(sensors)
 
 
@@ -44,41 +55,27 @@ class MevoSensor(CoordinatorEntity[dict], sensor.SensorEntity):
     _attr_native_unit_of_measurement = "bikes"
 
     def __init__(
-        self, coordinator: mevo_coordinator.MevoCoordinator, station: str):
+        self, coordinator: mevo_coordinator.MevoCoordinator,
+        station: str, station_id: str):
         super().__init__(coordinator)
         self.station = station
+        self._station_id = station_id
         self._attr_name = "Stacja " + station
-        self._attr_unique_id = station
-
-    def _station_id(self) -> str | None:
-        for station_id, info in self.coordinator.station_info.items():
-            if info.get("name") == self.station:
-                return station_id
-        return None
-
-    @property
-    def available(self) -> bool:
-        return super().available and self._station_id() is not None
+        self._attr_unique_id = station_id
 
     @property
     def native_value(self):
-        station_id = self._station_id()
-        if station_id is None:
-            return None
-        status = self.coordinator.data.get(station_id)
+        status = self.coordinator.data.get(self._station_id)
         if status is None:
             return None
         return status.get("num_bikes_available", 0)
 
     @property
     def extra_state_attributes(self) -> dict | None:
-        station_id = self._station_id()
-        if station_id is None:
-            return None
-        info = self.coordinator.station_info.get(station_id, {})
-        status = self.coordinator.data.get(station_id, {})
+        info = self.coordinator.station_info.get(self._station_id, {})
+        status = self.coordinator.data.get(self._station_id, {})
         attrs = {
-            const.ATTR_STATION_ID: station_id,
+            const.ATTR_STATION_ID: self._station_id,
             const.ATTR_ADDRESS: info.get("address"),
             const.ATTR_LATITUDE: info.get("lat"),
             const.ATTR_LONGITUDE: info.get("lon"),
