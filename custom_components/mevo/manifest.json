@@ -1,13 +1,13 @@
 {
+  "domain": "mevo",
+  "name": "Mevo",
   "codeowners": ["@dulek"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/dulek/ha_mevo",
-  "domain": "mevo",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/dulek/ha_mevo/issues",
-  "name": "Mevo",
   "requirements": [],
   "version": "0.1.0"
 }
