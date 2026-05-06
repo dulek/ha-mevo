@@ -1,6 +1,6 @@
 {
   "codeowners": ["@dulek"],
-  "config_flow": false,
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/dulek/ha_mevo",
   "domain": "mevo",

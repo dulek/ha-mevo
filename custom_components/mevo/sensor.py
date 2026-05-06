@@ -1,51 +1,30 @@
-from collections import abc
 import logging
 
-import voluptuous as vol
-
 from homeassistant.components import sensor
-from homeassistant import core
-from homeassistant.helpers import aiohttp_client
-import homeassistant.helpers.config_validation as cv
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-import homeassistant.helpers.typing as ha_typing
 
 from . import const
 from . import coordinator as mevo_coordinator
-from . import mevo_api
 
 LOG = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = sensor.PLATFORM_SCHEMA.extend({
-    vol.Required(const.CONF_STATIONS): vol.All(cv.ensure_list, [cv.string]),
-})
 
-
-def _resolve_station_id(
-    coordinator: mevo_coordinator.MevoCoordinator, name: str) -> str | None:
-    for station_id, info in coordinator.station_info.items():
-        if info.get("name") == name:
-            return station_id
-    return None
-
-
-async def async_setup_platform(
-    hass: core.HomeAssistant, config: ha_typing.ConfigType,
-    async_add_entities: abc.Callable,
-    discovery_info: ha_typing.DiscoveryInfoType | None = None) -> None:
-    """Set up the sensor platform."""
-    session = aiohttp_client.async_get_clientsession(hass)
-    api = mevo_api.MevoAPI(session)
-    coordinator = mevo_coordinator.MevoCoordinator(hass, api)
-    await coordinator.async_config_entry_first_refresh()
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback) -> None:
+    coordinator: mevo_coordinator.MevoCoordinator = (
+        hass.data[const.DOMAIN][entry.entry_id])
 
     sensors = []
-    for station in config[const.CONF_STATIONS]:
-        station_id = _resolve_station_id(coordinator, station)
-        if station_id is None:
-            LOG.error("Station %s not found in Mevo API", station)
+    for station_id in entry.data[const.CONF_STATIONS]:
+        info = coordinator.station_info.get(station_id)
+        if info is None:
+            LOG.error("Station %s not found in Mevo API", station_id)
             continue
-        sensors.append(MevoSensor(coordinator, station, station_id))
+        sensors.append(MevoSensor(coordinator, station_id, info))
     async_add_entities(sensors)
 
 
@@ -56,11 +35,10 @@ class MevoSensor(CoordinatorEntity[dict], sensor.SensorEntity):
 
     def __init__(
         self, coordinator: mevo_coordinator.MevoCoordinator,
-        station: str, station_id: str):
+        station_id: str, info: dict):
         super().__init__(coordinator)
-        self.station = station
         self._station_id = station_id
-        self._attr_name = "Stacja " + station
+        self._attr_name = "Stacja " + info.get("name", station_id)
         self._attr_unique_id = station_id
 
     @property
