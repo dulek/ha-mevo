@@ -1,7 +1,10 @@
 # Mevo sensors for Home Assistant
 
 Integrate the Tricity Mevo bike API with Home Assistant to monitor bike counts
-at stations. This integration can be installed using [HACS](https://hacs.xyz/).
+at stations. This integration can be installed using the Home Assistant Marketplace
+or [HACS](https://hacs.xyz/).
+
+[![Open this repository in Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=dulek&repository=ha-mevo&category=integration)
 
 ## Features
 
@@ -11,9 +14,10 @@ at stations. This integration can be installed using [HACS](https://hacs.xyz/).
 
 ## Installation
 
-1. Add this repository to HACS as a custom integration.
-2. Install the integration via HACS.
-3. Restart Home Assistant.
+1. Open the repository using the badge above. If it is not in the catalog yet,
+   add it as a custom integration when prompted.
+2. Install **Mevo** in the Marketplace or HACS.
+3. Restart Home Assistant if prompted.
 
 ## Configuration
 

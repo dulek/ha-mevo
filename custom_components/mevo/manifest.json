@@ -1,13 +1,14 @@
 {
   "domain": "mevo",
   "name": "Mevo",
+  "categories": ["vehicles_transport.bikes_scooters"],
   "codeowners": ["@dulek"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/dulek/ha_mevo",
+  "documentation": "https://github.com/dulek/ha-mevo",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/dulek/ha_mevo/issues",
+  "issue_tracker": "https://github.com/dulek/ha-mevo/issues",
   "requirements": [],
-  "version": "0.1.0"
+  "version": "0.9.1"
 }
