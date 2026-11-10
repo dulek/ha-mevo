@@ -4,11 +4,11 @@
   "categories": ["vehicles_transport.bikes_scooters"],
   "codeowners": ["@dulek"],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": ["http", "lovelace"],
   "documentation": "https://github.com/dulek/ha-mevo",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/dulek/ha-mevo/issues",
   "requirements": [],
-  "version": "0.9.2"
+  "version": "0.9.3"
 }
