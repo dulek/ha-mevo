@@ -2,7 +2,7 @@ import {
     LitElement, html, css, nothing,
 } from "lit";
 
-const VERSION = "0.9.4";
+const VERSION = "0.9.4-beta2";
 
 console.info(
     `%c MEVO-CARD %c v${VERSION} `,
@@ -344,7 +344,12 @@ class MevoCard extends LitElement {
             if (haMap.setView) haMap.setView(center, this._config.zoom);
             else haMap.leafletMap.setView(center, this._config.zoom);
         } else {
-            haMap.fitBounds(latlngs, { zoom: 16, pad: 0.15 });
+            // fitBounds fits coordinates, not the marker boxes around them.
+            haMap.fitBounds(latlngs, {
+                zoom: 16,
+                pad: 0.15,
+                padding: { top: 32, right: 72, bottom: 32, left: 72 },
+            });
         }
         this._fitDone = true;
     }
