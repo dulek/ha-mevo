@@ -71,7 +71,7 @@ If you manage dashboard resources in YAML, add this module resource yourself:
 ```yaml
 lovelace:
   resources:
-    - url: /mevo/mevo-card.js?v=0.9.3
+    - url: /mevo/mevo-card.js?v=0.9.4
       type: module
 ```
 

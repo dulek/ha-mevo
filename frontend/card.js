@@ -2,7 +2,7 @@ import {
     LitElement, html, css, nothing,
 } from "lit";
 
-const VERSION = "0.9.3";
+const VERSION = "0.9.4";
 
 console.info(
     `%c MEVO-CARD %c v${VERSION} `,
@@ -262,7 +262,7 @@ class MevoCard extends LitElement {
                 id: station.entity,
                 location: [station.lat, station.lng],
                 element,
-                elementSize: [180, 56],
+                elementSize: [120, 52],
                 title: station.name,
                 activatable: Boolean(station.rentalUri),
             };
@@ -456,11 +456,17 @@ class MevoMapMarker extends LitElement {
         }
         :host([map-engine]) {
             box-sizing: border-box;
-            width: 180px;
-            height: 56px;
+            width: 120px;
+            height: 52px;
             justify-content: center;
             transform: none;
             margin-top: 0;
+        }
+        :host([map-engine]) .name {
+            max-width: 106px;
+        }
+        :host([map-engine]) .counts {
+            gap: 6px;
         }
         .name {
             font-weight: 600;
