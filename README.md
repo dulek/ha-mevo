@@ -48,7 +48,9 @@ stations:
 
 Add `view: map` for the map view. Each station needs `latitude` and `longitude`
 attributes, which this integration provides. The card also accepts any sensor
-with `bikes_available` and `ebikes_available` attributes.
+with `bikes_available` and `ebikes_available` attributes. Station links are
+clickable only when `rental_uri` uses Mevo's `rowermevo:` app link scheme.
+Every other URI scheme is ignored by the card.
 
 ![Mevo Card list view](images/mevo-card-list.png)
 ![Mevo Card map view](images/mevo-card-map.png)
@@ -71,7 +73,7 @@ If you manage dashboard resources in YAML, add this module resource yourself:
 ```yaml
 lovelace:
   resources:
-    - url: /mevo/mevo-card.js?v=0.9.4-beta2
+    - url: /mevo/mevo-card.js?v=0.9.5
       type: module
 ```
 

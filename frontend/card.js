@@ -1,8 +1,9 @@
 import {
     LitElement, html, css, nothing,
 } from "lit";
+import { safeRentalUrl } from "./rental-url.js";
 
-const VERSION = "0.9.4-beta2";
+const VERSION = "0.9.5";
 
 console.info(
     `%c MEVO-CARD %c v${VERSION} `,
@@ -208,9 +209,9 @@ class MevoCard extends LitElement {
                 || station.entity;
             const bikes = state.attributes.bikes_available ?? "?";
             const ebikes = state.attributes.ebikes_available ?? "?";
-            const rentalUri = state.attributes.rental_uri;
+            const rentalUrl = safeRentalUrl(state.attributes.rental_uri);
             stations.push({ entity: station.entity, lat, lng, name,
-                bikes, ebikes, rentalUri });
+                bikes, ebikes, rentalUrl });
             latlngs.push([lat, lng]);
         }
 
@@ -264,7 +265,7 @@ class MevoCard extends LitElement {
                 element,
                 elementSize: [120, 52],
                 title: station.name,
-                activatable: Boolean(station.rentalUri),
+                activatable: Boolean(station.rentalUrl),
             };
         });
         if (home) {
@@ -305,9 +306,9 @@ class MevoCard extends LitElement {
             const marker = L.marker([station.lat, station.lng], {
                 icon, title: station.name,
             });
-            if (station.rentalUri) {
+            if (station.rentalUrl) {
                 marker.on("click", () => {
-                    window.open(station.rentalUri, "_blank", "noopener");
+                    window.open(station.rentalUrl, "_blank", "noopener");
                 });
             }
             return marker;
@@ -329,8 +330,10 @@ class MevoCard extends LitElement {
         const station = this._config.stations.find(
             (item) => item.entity === event.detail.id,
         );
-        const rentalUri = this.hass.states[station?.entity]?.attributes.rental_uri;
-        if (rentalUri) window.open(rentalUri, "_blank", "noopener");
+        const rentalUrl = safeRentalUrl(
+            this.hass.states[station?.entity]?.attributes.rental_uri,
+        );
+        if (rentalUrl) window.open(rentalUrl, "_blank", "noopener");
     }
 
     _fitBounds(haMap, latlngs) {
@@ -377,7 +380,7 @@ class MevoCard extends LitElement {
             || station.entity;
         const bikes = state.attributes.bikes_available ?? "?";
         const ebikes = state.attributes.ebikes_available ?? "?";
-        const rentalUri = state.attributes.rental_uri;
+        const rentalUrl = safeRentalUrl(state.attributes.rental_uri);
 
         const body = html`
             <div class="mevo-badge-title">${name}</div>
@@ -394,9 +397,9 @@ class MevoCard extends LitElement {
             </div>
         `;
 
-        if (rentalUri) {
+        if (rentalUrl) {
             return html`
-                <a class="mevo-badge mevo-badge-link" href=${rentalUri}>
+                <a class="mevo-badge mevo-badge-link" href=${rentalUrl}>
                     ${body}
                 </a>
             `;
