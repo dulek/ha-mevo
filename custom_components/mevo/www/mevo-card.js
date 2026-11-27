@@ -20,7 +20,7 @@
  * @license
  * Copyright 2022 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */function D(n){if(typeof n!="string"||!n.trim())return null;try{let t=new URL(n);return t.protocol==="rowermevo:"?t.href:null}catch{return null}}var Pt="0.9.5";console.info(`%c MEVO-CARD %c v${Pt} `,"color: white; background: #00b8d4; font-weight: 700;","color: #00b8d4; background: white; font-weight: 700;");var U=null;function Tt(){return customElements.get("ha-map")?Promise.resolve():U||(U=(async()=>{await(await window.loadCardHelpers()).createCardElement({type:"map",entities:[]}),await customElements.whenDefined("ha-map")})().catch(n=>{throw U=null,n}),U)}var Q=class n extends f{static properties={hass:{attribute:!1},_config:{state:!0}};static styles=A`
+ */function D(n){if(typeof n!="string"||!n.trim())return null;try{let t=new URL(n);return t.protocol==="rowermevo:"?t.href:null}catch{return null}}var Pt="0.9.6";console.info(`%c MEVO-CARD %c v${Pt} `,"color: white; background: #00b8d4; font-weight: 700;","color: #00b8d4; background: white; font-weight: 700;");var U=null;function Tt(){return customElements.get("ha-map")?Promise.resolve():U||(U=(async()=>{await(await window.loadCardHelpers()).createCardElement({type:"map",entities:[]}),await customElements.whenDefined("ha-map")})().catch(n=>{throw U=null,n}),U)}var Q=class n extends f{static properties={hass:{attribute:!1},_config:{state:!0}};static styles=A`
         .chip-container {
             display: flex;
             flex-wrap: wrap;

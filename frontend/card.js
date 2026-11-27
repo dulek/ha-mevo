@@ -3,7 +3,7 @@ import {
 } from "lit";
 import { safeRentalUrl } from "./rental-url.js";
 
-const VERSION = "0.9.5";
+const VERSION = "0.9.6";
 
 console.info(
     `%c MEVO-CARD %c v${VERSION} `,
