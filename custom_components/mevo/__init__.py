@@ -1,13 +1,15 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import aiohttp_client
+from homeassistant.helpers import aiohttp_client, config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
 from . import const
 from . import coordinator as mevo_coordinator
 from . import frontend as mevo_frontend
 from . import mevo_api
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(const.DOMAIN)
 
 PLATFORMS = [Platform.SENSOR]
 
